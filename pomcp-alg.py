@@ -85,7 +85,7 @@ class POMCP_Solver:
 		"""
 		list_of_probabilities = history[robot_action].compute_boltzmann_probabilities(self.beta)
 		human_actions = self.game.getAllObservations()
-		sample_human_action = np.random.choice(human_actions, list_of_probabilities)
+		sample_human_action = np.random.choice(human_actions, p = list_of_probabilities)
 
 		next_state = self.game.getNextState(state, robot_action, sample_human_action)
 		next_reward = self.game.getReward(next_state)
