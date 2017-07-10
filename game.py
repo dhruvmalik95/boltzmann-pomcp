@@ -45,8 +45,8 @@ class Game:
         :param robot_action: the robot's action.
         :param human_action: the human's action.
         """
-        if robot_action == human_action:
-            return current_state
+        # if robot_action == human_action:
+        #     return current_state
         total_action = tuple(map(add, human_action, robot_action))
         state = (tuple(map(add, current_state[0], total_action)), current_state[1])
         return state
