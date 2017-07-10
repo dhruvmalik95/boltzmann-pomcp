@@ -5,7 +5,7 @@ from humannode import *
 from robotnode import *
 
 class POMCP_Solver:
-	def __init__(self, gamma, epsilon, timer, history, game, c, beta):
+	def __init__(self, gamma, epsilon, timer, history, game, c, beta, behavior):
 		"""
 		creates a instance of a POMCP_Solver.
 		:param gamma: this is the discount factor
@@ -23,14 +23,15 @@ class POMCP_Solver:
 		self.game = game
 		self.c = c
 		self.beta = beta
+		self.behavior = behavior
 		self.actions = self.game.getAllActions()
 		self.observations = self.game.getAllObservations()
 		self.theta_list = self.game.getAllTheta()
 
 	def search(self):
 		for _ in range(0, self.timer):
-			if _ % 100000 == 0:
-				print(_)
+			# if _ % 100000 == 0:
+			# 	print(_)
 			sample_state = self.history.sample_belief()
 			self.simulate(sample_state, self.history, 0)
 			# if _ > 4:
@@ -113,7 +114,13 @@ class POMCP_Solver:
 			#should this be the reward or gamma^depth*reward
 			return rollout_value
 
-		next_state, human_action = self.sampleBoltzmann(state, optimal_action, history)
+		if self.behavior == "boltzmann":
+			next_state, human_action = self.sampleBoltzmann(state, optimal_action, history)
+		elif self.behavior == "rational":
+			next_state, human_action = self.sampleRational(state, optimal_action, history)
+		else:
+			print("wrong behavior input")
+
 		next_history = history.children[self.actions.index(optimal_action)].children[self.observations.index(human_action)]
 		if next_history == "empty":
 			new_human_obs_child = new_human_obs_child = HumanNode(self.game, 0, state[1])
@@ -160,7 +167,24 @@ class POMCP_Solver:
 
 		return next_state, random_human_action
 
+	def sampleRational(self, state, robot_action, history):
+		theta = state[1]
+		theta_index = self.theta_list.index(theta)
+		qValues = []
+		
+		for child in history.children[self.actions.index(robot_action)].children:
+			#add exploration bonus for 0 times human action for that theta HERE
+			if child == "empty":
+				child_index = history.children[self.actions.index(robot_action)].children.index(child)
+				next_human_action = self.observations[child_index]
+				next_state = self.game.getNextState(state, robot_action, next_human_action)
+				return next_state, next_human_action
+				#print("x")
+			else:
+				qValues.append(child.value_list[theta_index] + self.c/(3*child.visited_list[theta_index] + 1))
 
-
-
+		best_index = qValues.index(max(qValues))
+		next_human_action = self.observations[best_index]
+		next_state = self.game.getNextState(state, robot_action, next_human_action)
+		return next_state, next_human_action
 
