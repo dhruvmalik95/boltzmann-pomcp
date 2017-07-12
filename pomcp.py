@@ -7,7 +7,7 @@ from robotnode import *
 class POMCP_Solver:
 	def __init__(self, gamma, epsilon, timer, history, game, c, beta, behavior):
 		"""
-		creates a instance of a POMCP_Solver.
+		creates an instance of a POMCP_Solver.
 		:param gamma: this is the discount factor
 		:param epsilon: this is the tolerance factor at which the rollout can be stopped
 		:param timer: this is how long the search function is called
@@ -15,6 +15,7 @@ class POMCP_Solver:
 		:param game: the game that we pass in
 		:param c: the constant which affects how much exploration vs. exploitation we want
 		:param beta: the constant which measures human rationality
+		:param behavior: the model of human rationality (rational or boltzmann)
 		"""
 		self.gamma = gamma
 		self.epsilon = epsilon
@@ -29,6 +30,10 @@ class POMCP_Solver:
 		self.theta_list = self.game.getAllTheta()
 
 	def search(self):
+		"""
+		The search function as described in Silver et al. Samples a start state for self.timer iterations.
+		Prints optimal action and its value after iterations are complete.
+		"""
 		for _ in range(0, self.timer):
 			# if _ % 100000 == 0:
 			# 	print(_)
@@ -65,10 +70,22 @@ class POMCP_Solver:
 		return
 
 	def random_sample(self, list_to_sample):
+		"""
+		Returns a random sample from the list_to_sample.
+		:param list_to_sample: the list we want to sample from
+		"""
 		random_index = np.random.choice(range(0, len(list_to_sample)))
 		return list_to_sample[random_index]
 
 	def rollout_helper(self, state, robot_action, history, depth):
+		"""
+		Calls the rollout function and adds the search nodes created by the rollout to search tree.
+		Returns the value from the rollout function.
+		:param state: the starting rollout state
+		:param robot_action: the starting robot_action (the original optimal_action)
+		:param history: the history from which we begin the rollout (we add children to this history)
+		:param depth: the current depth we are at in the search tree
+		"""
 		random_human_action = self.random_sample(self.observations)
 		value = self.rollout(state, robot_action, random_human_action, depth)
 
@@ -85,6 +102,12 @@ class POMCP_Solver:
 		return value
 
 	def rollout(self, state, robot_action, human_action, depth):
+		"""
+		Actually performs the rollout by randomly sampling robot and human actions.
+		Returns the value achieved from the rollout.
+		:param robot_action: the robot action to be used for the rollout
+		:param human_action: the human action to be sued for the rollout
+		"""
 		if self.game.getReward(state):
 			return 1
 
@@ -99,6 +122,16 @@ class POMCP_Solver:
 		return self.gamma*self.rollout(next_state, next_robot_action, next_human_action, depth + 1)
 
 	def simulate(self, state, history, depth):
+		"""
+		The recursive Simulate function as described in Silver et al. Simulates the start state moving down
+		the search tree, by picking the optimal action at each point in the tree and simulating
+		future observations (human actions). Incrementally builds the search tree and updates
+		the values/visited counts of each search node it hits. Returns the value achieved from
+		passing the state down.
+		:param state: the starting state
+		:param history: the history we are currently at in the search tree
+		:param depth: the current depth we are at in the search tree
+		"""
 		if self.game.getReward(state):
 			history.update_visited(state[1])
 			history.update_value(1, state[1])
@@ -123,6 +156,8 @@ class POMCP_Solver:
 
 		next_history = history.children[self.actions.index(optimal_action)].children[self.observations.index(human_action)]
 		if next_history == "empty":
+			
+			#what the fuck is this hahaha?
 			new_human_obs_child = new_human_obs_child = HumanNode(self.game, 0, state[1])
 			new_human_obs_child.visited_list[self.theta_list.index(state[1])] -= 1
 			history.children[self.actions.index(optimal_action)].children[self.observations.index(human_action)] = new_human_obs_child
@@ -140,6 +175,13 @@ class POMCP_Solver:
 		return R
 
 	def sampleBoltzmann(self, state, robot_action, history):
+		"""
+		Places a Boltzmann distribution over the future observations (human actions).
+		Returns a sampled human action from this distribution.
+		:param state: the state we are currently at
+		:param robot_action: the robot action that was selected to lead us to this set of human actions
+		:param history: the part of search tree we are currently at
+		"""
 		theta = state[1]
 		theta_index = self.theta_list.index(theta)
 		qValues = []
@@ -168,6 +210,13 @@ class POMCP_Solver:
 		return next_state, random_human_action
 
 	def sampleRational(self, state, robot_action, history):
+		"""
+		Assumes the human acts rationally with respect to his actions (+ exploration).
+		Returns the rational human action.
+		:param state: the state we are currently at
+		:param robot_action: the robot action that was selected to lead us to this set of human actions
+		:param history: the part of search tree we are currently at		
+		"""
 		theta = state[1]
 		theta_index = self.theta_list.index(theta)
 		qValues = []
