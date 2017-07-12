@@ -15,7 +15,7 @@ class RobotNode:
 
 	def make_children(self):
 		"""
-		Makes the children (human actions) of the HumanNode.
+		Makes the children (human actions) of the RobotNode.
 		"""
 		children = []
 		for action in self.observations:
