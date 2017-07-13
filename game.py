@@ -63,9 +63,9 @@ class Game:
         """
         Returns all possible world states in the game as a Python list.
         """
-        arrays = [list(range(3))]
+        arrays = [list(range(5))]
         for i in range(1, self.num_ingredients):
-            arrays.append(list(range(3)))
+            arrays.append(list(range(5))) #regular = 3, script_limit = 
         return list(itertools.product(*arrays))
 
     def getAllTheta(self):

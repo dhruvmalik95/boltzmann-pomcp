@@ -3,6 +3,9 @@ import math
 
 from humannode import *
 from robotnode import *
+from timeit import default_timer as timer
+import requests
+from timeout import *
 
 class POMCP_Solver:
 	def __init__(self, gamma, epsilon, timer, history, game, c, beta, behavior):
@@ -28,17 +31,37 @@ class POMCP_Solver:
 		self.actions = self.game.getAllActions()
 		self.observations = self.game.getAllObservations()
 		self.theta_list = self.game.getAllTheta()
+		self.data = []
 
 	def search(self):
 		"""
 		The search function as described in Silver et al. Samples a start state for self.timer iterations.
 		Prints optimal action and its value after iterations are complete.
 		"""
+		start_0 = timer()
+		start = start_0
 		for _ in range(0, self.timer):
+			print(_)
 			# if _ % 100000 == 0:
 			# 	print(_)
 			sample_state = self.history.sample_belief()
 			self.simulate(sample_state, self.history, 0)
+
+			# t = timer()
+			# if t - start > 0.05 and _ > 4:
+			# 	optimal_action = self.history.optimal_action(0)
+			# 	optimal_child = self.history.children[self.actions.index(optimal_action)]
+			# 	self.data.append((t-start_0, optimal_child.value))
+			# 	start = t
+
+			# if timer() - start_0 > 4*60:
+			# 	return
+
+			if _ > 4 and _%20==0:
+				optimal_action = self.history.optimal_action(0)
+				optimal_child = self.history.children[self.actions.index(optimal_action)]
+				self.data.append((_,optimal_child.value))
+				
 			# if _ > 4:
 				# print(self.history.children[self.actions.index((0,0,1))].value)
 				# print(self.history.children[self.actions.index((0,0,1))].visited)
@@ -52,6 +75,7 @@ class POMCP_Solver:
 		for child in self.history.children:
 			l.append(child.value)
 		print(l)
+
 		#print(optimal_child.visited)
 		
 		# # #THIS TEST CASE NOW WORKS!!
@@ -67,7 +91,7 @@ class POMCP_Solver:
 		# 	print(t)
 		# 	print(" ")
 		# 	t = 0
-		return
+		return self.data
 
 	def random_sample(self, list_to_sample):
 		"""
