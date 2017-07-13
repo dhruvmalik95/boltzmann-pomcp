@@ -20,7 +20,7 @@ CHANGE GAME FILE BASED ON SCRIPT!!
 
 robot_belief = [1/num_theta for i in range(num_theta)]
 
-reward_set = [((0,2,4,2,0),0), ((2,0,4,0,2),1), ((0,0,6,0,0),2), ((1,0,2,4,1),3)]
+reward_set = [((0,2,4,2,0),0), ((2,0,4,0,2),1), ((0,0,6,0,0),2), ((1,0,2,2,1),3)]
 
 initial_world_state = (0,0,0,0,0)
 #initial_world_state = (0,0,0,0,0)
@@ -38,7 +38,7 @@ epsilon = math.pow(0.95, 4)
 
 for _ in range(0, 1):
 #KEEP THESE PARAMETERS FOR NOW!!
-	solver = POMCP_Solver(0.95, epsilon, 1500000, initial_history, game, 300, 5, "rational")
+	solver = POMCP_Solver(0.95, epsilon, 50000000, initial_history, game, 300, 5, "rational")
 	solver.search()
 	print("Required Horizon: 4 (2 actions per turn)")
 	print("Number Of Theta: 4")
