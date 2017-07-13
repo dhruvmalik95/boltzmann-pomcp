@@ -41,7 +41,8 @@ class POMCP_Solver:
 		start_0 = timer()
 		start = start_0
 		for _ in range(0, self.timer):
-			print(_)
+			if _ % 100000 == 0:
+				print(_)
 			# if _ % 100000 == 0:
 			# 	print(_)
 			sample_state = self.history.sample_belief()
@@ -57,7 +58,7 @@ class POMCP_Solver:
 			# if timer() - start_0 > 4*60:
 			# 	return
 
-			if _ > 4 and _%20==0:
+			if _ > 4 and _%50==0:
 				optimal_action = self.history.optimal_action(0)
 				optimal_child = self.history.children[self.actions.index(optimal_action)]
 				self.data.append((_,optimal_child.value))
