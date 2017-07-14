@@ -41,7 +41,7 @@ class POMCP_Solver:
 		start_0 = timer()
 		start = start_0
 		for _ in range(0, self.timer):
-			if _ % 1000000 == 0:
+			if _ % 100000 == 0:
 				print(_)
 			# if _ % 100000 == 0:
 			# 	print(_)
