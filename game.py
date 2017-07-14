@@ -65,7 +65,7 @@ class Game:
         """
         arrays = []
         for i in range(self.num_ingredients):
-            arrays.append(list(range(3))) #regular = 3, script_limit = 
+            arrays.append(list(range(7))) #regular = 3, script_limit = 
         return list(itertools.product(*arrays))
 
     def getAllTheta(self):

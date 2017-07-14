@@ -20,7 +20,7 @@ CHANGE GAME FILE BASED ON SCRIPT!!
 
 robot_belief = [1/num_theta for i in range(num_theta)]
 
-reward_set = [((2,0,2),0), ((0,2,1),1), ((0,1,2),2)]
+reward_set = [((3,0,3),0), ((0,3,2),1), ((0,2,3),2)]
 
 initial_world_state = (0,0,0)
 #initial_world_state = (0,0,0,0,0)
@@ -34,7 +34,7 @@ game = Game(robot, humanPolicy, initial_world_state, num_theta, num_ingredients,
 initial_history = Root(game, [((0,0,0),0), ((0,0,0),1), ((0,0,0),2)], 0)
 
 #make sure to change exploration accordingly - also what should the epsilon value be?
-epsilon = math.pow(0.95, 2)
+epsilon = math.pow(0.95, 3)
 
 for _ in range(0, 1):
 #KEEP THESE PARAMETERS FOR NOW!!
