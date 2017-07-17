@@ -30,13 +30,19 @@ class Root:
 		Returns the optimal robot action to take from this search node.
 		:param c: the constant that controls how much exploration should be done.
 		"""
-		for i in range(0, len(self.children)):
-			if self.children[i] == "empty":
-				return self.actions[i]
+		# for i in range(0, len(self.children)):
+		# 	if self.children[i] == "empty":
+		# 		return self.actions[i]
 
 		values = []
 		for i in range(0, len(self.children)):
-			values.append(self.children[i].augmented_value(c))
+			#print(2)
+			if self.children[i] == "empty":
+				#print(3)
+				values.append(c)
+			else:
+				#print(4)
+				values.append(self.children[i].augmented_value(c))
 
 		return self.actions[values.index(max(values))]
 

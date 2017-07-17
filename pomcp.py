@@ -133,11 +133,11 @@ class POMCP_Solver:
 		:param robot_action: the robot action to be used for the rollout
 		:param human_action: the human action to be sued for the rollout
 		"""
-		if self.game.getReward(state):
-			return 1
-
 		if math.pow(self.gamma, depth) < self.epsilon:
 			return 0
+
+		if self.game.getReward(state):
+			return 1
 
 		next_state = self.game.getNextState(state, robot_action, human_action)
 		next_robot_action = self.random_sample(self.actions)
@@ -157,13 +157,13 @@ class POMCP_Solver:
 		:param history: the history we are currently at in the search tree
 		:param depth: the current depth we are at in the search tree
 		"""
+		if math.pow(self.gamma, depth) < self.epsilon:
+			return 0
+			
 		if self.game.getReward(state):
 			history.update_visited(state[1])
 			history.update_value(1, state[1])
 			return 1
-
-		if math.pow(self.gamma, depth) < self.epsilon:
-			return 0
 
 		optimal_action = history.optimal_action(self.c)
 		
@@ -249,10 +249,13 @@ class POMCP_Solver:
 		for child in history.children[self.actions.index(robot_action)].children:
 			#add exploration bonus for 0 times human action for that theta HERE
 			if child == "empty":
-				child_index = history.children[self.actions.index(robot_action)].children.index(child)
-				next_human_action = self.observations[child_index]
-				next_state = self.game.getNextState(state, robot_action, next_human_action)
-				return next_state, next_human_action
+				qValues.append(0 + self.c/4)
+
+				# OLD
+				# child_index = history.children[self.actions.index(robot_action)].children.index(child)
+				# next_human_action = self.observations[child_index]
+				# next_state = self.game.getNextState(state, robot_action, next_human_action)
+				# return next_state, next_human_action
 				#print("x")
 			else:
 				qValues.append(child.value_list[theta_index] + self.c/(3*child.visited_list[theta_index] + 1))

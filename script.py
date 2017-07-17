@@ -49,7 +49,7 @@ epsilon = math.pow(0.95, 2)
 
 for _ in range(0, 1):
 #KEEP THESE PARAMETERS FOR NOW!!
-	solver = POMCP_Solver(0.95, epsilon, 5000000, initial_history, game, 300, 5, "rational")
+	solver = POMCP_Solver(0.95, epsilon, 500000, initial_history, game, 0.1, 5, "rational")
 	solver.search()
 	data = solver.data
 	f = open('data-pomcp.txt', 'w')
